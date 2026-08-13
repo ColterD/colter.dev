@@ -1,0 +1,11 @@
+name = "colter-dev"
+account_id = "5409c4f68aa060e1f3723cc978c075d3"
+compatibility_date = "2026-08-13"
+workers_dev = false
+
+# Serve the apex directly from this Worker (fixes "Visitors cannot reach colter.dev")
+routes = [{ pattern = "colter.dev", custom_domain = true }]
+
+[assets]
+directory = "./public"
+not_found_handling = "single-page-application"

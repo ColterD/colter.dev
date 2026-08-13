@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Colter Dahlberg</title>
+  <meta name="description" content="Colter Dahlberg — systems, AI, open source. A personal hub: services, what I'm building, and where to find me." />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#44404d" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='3' fill='%23ffd79a'/%3E%3C/svg%3E" />
+  <link rel="preload" href="/fonts/lexend-var.woff2" as="font" type="font/woff2" crossorigin />
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="starfield" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <main class="hub">
+    <header class="identity">
+      <h1>Colter Dahlberg</h1>
+      <p class="tagline">Systems · AI · Open Source</p>
+    </header>
+
+    <nav class="services" aria-label="Services">
+      <a class="row" href="https://llm.colter.dev/" target="_blank" rel="noopener">
+        <span class="row__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.4"/><circle cx="18" cy="5" r="2.4"/><path d="M8.1 17.9 16 8 M12 19h6 M6 5H4"/></svg></span>
+        <span class="row__text"><span class="row__title">OmniRoute</span><span class="row__sub">One endpoint, every model</span></span>
+        <span class="row__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7 M9 7h8v8"/></svg></span>
+      </a>
+      <a class="row" href="https://github.com/ColterD" target="_blank" rel="noopener">
+        <span class="row__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></span>
+        <span class="row__text"><span class="row__title">GitHub</span><span class="row__sub">github.com/ColterD</span></span>
+        <span class="row__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7 M9 7h8v8"/></svg></span>
+      </a>
+      <a class="row" href="https://colter.plus" target="_blank" rel="noopener">
+        <span class="row__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.2"/><path d="M10.2 9.2 15 12l-4.8 2.8z"/></svg></span>
+        <span class="row__text"><span class="row__title">Colter+</span><span class="row__sub">Self-hosted streaming library</span></span>
+        <span class="row__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7 M9 7h8v8"/></svg></span>
+      </a>
+    </nav>
+
+    <section class="work" aria-labelledby="work-h">
+      <h2 id="work-h">Currently working on</h2>
+      <div class="cards">
+        <article class="card">
+          <div class="card__head">
+            <span class="card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="13" height="13" rx="2"/><path d="M12 9.4v5.2 M9.4 12h5.2 M9 3.5v2 M15 3.5v2 M9 18.5v2 M15 18.5v2 M3.5 9h2 M3.5 15h2 M18.5 9h2 M18.5 15h2"/></svg></span>
+            <span class="card__title">emily</span>
+            <span class="badge" aria-label="private repository">private</span>
+          </div>
+          <p class="card__desc">“We're stuck at ‘agentic.’ Emily is what comes after.”<sup class="cite"><a href="#ref-1" aria-label="reference 1">1</a><a href="#ref-2" aria-label="reference 2">2</a></sup></p>
+        </article>
+        <article class="card">
+          <div class="card__head">
+            <span class="card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a1 1 0 0 1 1 1v15l-4-2.6-3 2-3-2L4 20V5a1 1 0 0 1 1-1Z"/><path d="M8.5 9.5h7 M8.5 13h4"/></svg></span>
+            <span class="card__title">coco</span>
+            <span class="badge" aria-label="private repository">private</span>
+          </div>
+          <p class="card__desc">A coding agent that ships itself.</p>
+        </article>
+      </div>
+    </section>
+
+    <nav class="socials" aria-label="Elsewhere">
+      <a class="social" href="https://www.linkedin.com/in/colter-dahlberg/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg></a>
+      <a class="social" href="https://bsky.app/profile/colter.dev" target="_blank" rel="noopener" aria-label="Bluesky"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5.202 2.857C7.954 4.922 10.913 9.11 12 11.358c1.087-2.247 4.046-6.436 6.798-8.501C20.783 1.366 24 .213 24 3.883c0 .732-.42 6.156-.667 7.037-.856 3.061-3.978 3.842-6.755 3.37 4.854.826 6.089 3.562 3.422 6.299-5.065 5.196-7.28-1.304-7.847-2.97-.104-.305-.152-.448-.153-.327 0-.121-.05.022-.153.327-.568 1.666-2.782 8.166-7.847 2.97-2.667-2.737-1.432-5.473 3.422-6.3-2.777.473-5.899-.308-6.755-3.369C.42 10.04 0 4.615 0 3.883c0-3.67 3.217-2.517 5.202-1.026"/></svg></a>
+      <a class="social" href="mailto:hello@colter.dev" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4.5 7 7.5 5.5L19.5 7"/></svg></a>
+    </nav>
+
+    <footer class="foot">
+      <ol class="refs" aria-label="References">
+        <li id="ref-1"><span class="ref-n">1</span> M.&nbsp;R. Morris et al., “Levels of AGI for Operationalizing Progress on the Path to AGI,” Google DeepMind (2023). <a href="https://arxiv.org/abs/2311.02462" target="_blank" rel="noopener">arXiv:2311.02462</a></li>
+        <li id="ref-2"><span class="ref-n">2</span> Feng et al., “Levels of Autonomy for AI Agents” (2025). <a href="https://arxiv.org/abs/2506.12469" target="_blank" rel="noopener">arXiv:2506.12469</a></li>
+      </ol>
+      <p class="copy">© <span id="year"></span> Colter Dahlberg</p>
+    </footer>
+  </main>
+
+  <!-- accessibility / display settings -->
+  <button id="settings-btn" class="settings-btn" type="button" aria-label="Accessibility and display settings" aria-expanded="false" aria-controls="settings-panel" title="Accessibility & display">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
+  <aside id="settings-panel" class="settings-panel" aria-label="Accessibility and display settings" inert>
+    <h2 class="settings-title">Display &amp; accessibility</h2>
+    <div class="settings-row">
+      <label for="set-anim">Animations</label>
+      <input type="checkbox" id="set-anim" class="switch" />
+    </div>
+    <div class="settings-row">
+      <label for="set-star">Star color</label>
+      <input type="color" id="set-star" />
+    </div>
+    <div class="settings-row settings-slider">
+      <label for="set-scale-title">Title size <span class="val" id="set-scale-title-val">100%</span></label>
+      <input type="range" id="set-scale-title" min="0.8" max="1.6" step="0.05" />
+    </div>
+    <div class="settings-row settings-slider">
+      <label for="set-scale-tagline">Tagline size <span class="val" id="set-scale-tagline-val">100%</span></label>
+      <input type="range" id="set-scale-tagline" min="0.8" max="1.6" step="0.05" />
+    </div>
+    <div class="settings-row settings-slider">
+      <label for="set-scale-body">Body size <span class="val" id="set-scale-body-val">100%</span></label>
+      <input type="range" id="set-scale-body" min="0.8" max="1.6" step="0.05" />
+    </div>
+    <button id="set-reset" class="set-reset" type="button">Reset to defaults</button>
+  </aside>
+
+  <script src="starfield.js" defer></script>
+  <script src="settings.js" defer></script>
+  <script>window.addEventListener("DOMContentLoaded",()=>{document.getElementById("year").textContent=new Date().getFullYear();requestAnimationFrame(()=>document.querySelector(".hub").classList.add("is-in"));});</script>
+</body>
+</html>
