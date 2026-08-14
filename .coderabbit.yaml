@@ -1,0 +1,8 @@
+# CodeRabbit — free AI code review for public repos. https://docs.coderabbit.ai
+language: en-US
+reviews:
+  auto_review:
+    enabled: true
+    drafts: false
+  path_filters:
+    - "!public/fonts/**"
