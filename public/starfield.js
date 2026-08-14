@@ -94,9 +94,11 @@
     },
     setColor(rgb) { accentRGB = rgb; if (!enabled) paintStatic(); },
     // easter-egg comet storm (Konami); each spawn re-checks `enabled` so turning
-    // animations off mid-storm stops it immediately
+    // animations off mid-storm stops it immediately. A new burst supersedes any
+    // storm still queued (its handles are cleared first, so nothing leaks).
     burst(n = 10) {
       if (!enabled) return;
+      burstTimers.forEach(clearTimeout);
       burstTimers = Array.from({ length: n }, (_, i) =>
         setTimeout(() => { if (enabled) spawnShooter(); }, i * 180));
     },

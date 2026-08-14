@@ -173,10 +173,11 @@ export default {
         `<span id="llm-status" title="OmniRoute health, checked from the edge">${llmBadge(llm)}</span>`);
       const headers = new Headers(res.headers);
       headers.set("Cache-Control", "public, max-age=60");
-      return new Response(html, { headers: headerEggs(headers) });
+      return new Response(html, { status: res.status, statusText: res.statusText, headers: headerEggs(headers) });
     } catch {
-      // degrade to the unmodified page — still carry the header eggs
-      return new Response(fallback.body, { headers: headerEggs(new Headers(fallback.headers)) });
+      // degrade to the unmodified page — still carry the header eggs; keep the
+      // original status so a 404/500 from assets isn't masked as 200
+      return new Response(fallback.body, { status: fallback.status, statusText: fallback.statusText, headers: headerEggs(new Headers(fallback.headers)) });
     }
   },
   async scheduled(_event, env, ctx) {
