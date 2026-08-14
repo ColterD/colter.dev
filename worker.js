@@ -100,14 +100,16 @@ export default {
     const isHTML = (url.pathname === "/" || url.pathname === "/index.html") && ct.includes("text/html");
     if (!isHTML) return res;
 
-    let raw = await env.REPOS.get("repos");
+    let raw = null;
+    try { raw = await env.REPOS.get("repos"); } catch { raw = null; } // a KV read error must never 500 the page
     if (!raw) {
       try { raw = await buildRepos(env); } catch { raw = null; }
       if (raw) env.REPOS.put("repos", raw, { expirationTtl: 600 }).catch(() => {});
     }
     // Health check NEVER blocks the render: on a KV miss the badge stays neutral
     // ("checking…") for this request while the check fills KV in the background.
-    let llm = await env.REPOS.get("llm-status", { type: "json" });
+    let llm = null;
+    try { llm = await env.REPOS.get("llm-status", { type: "json" }); } catch { llm = null; }
     if (!llm) {
       ctx.waitUntil(
         checkLlm()
