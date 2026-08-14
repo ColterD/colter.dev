@@ -1,4 +1,4 @@
-/* colter.dev — styles. Lexend, design tokens, settings panel, a11y payload. */
+/* colter.dev — styles. Lexend, Deep Space Regal palette, settings, a11y payload. */
 @font-face {
   font-family: 'Lexend';
   src: url('/fonts/lexend-var.woff2') format('woff2');
@@ -8,19 +8,25 @@
 }
 
 :root {
-  --bg:            #44404d;
-  --bg-deep:       #36323e;
-  --star-rgb:      255, 221, 157;          /* starfield color; settings can override */
-  --text:          #f6f3ef;
-  --text-muted:    #cdc7d2;
-  --text-faint:    #9a94a4;
-  --accent:        #ffd79a;
+  /* Deep Space Regal — royal-purple accent on a near-black violet void */
+  --bg:            #0E0A1A;
+  --bg-deep:       #070410;
+  --surface-rgb:   25, 18, 41;            /* #191229 — base for translucent panels */
   --surface:       rgba(255, 255, 255, 0.045);
   --surface-hi:    rgba(255, 255, 255, 0.085);
-  --border:        rgba(255, 255, 255, 0.09);
-  --border-hi:     rgba(255, 221, 157, 0.40);
+  --border:        rgba(255, 255, 255, 0.10);
+  --border-hi:     rgba(157, 123, 224, 0.45);
+  --text:          #F3EEFA;
+  --text-muted:    #C6B8DC;
+  --text-faint:    #8A7DA3;
+  --accent:        #9D7BE0;               /* royal purple, lightened to clear WCAG AA */
+  --accent-hover:  #B49AEE;
+  --star-rgb:      157, 123, 224;          /* rare/accent star color (settings picks this) */
+  --card-alpha:    0.7;                    /* card + row panel opacity (settings slider) */
   --radius:        14px;
   --radius-sm:     10px;
+  --ok:#5DD39E; --bad:#FF6B85; --warn:#F0C674;
+  --mono: ui-monospace,'SFMono-Regular','Cascadia Code',Consolas,monospace;
   --sans:          'Lexend', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   /* per-type text scale (settings sliders) */
   --scale-title:   1;
@@ -50,13 +56,13 @@ body {
 .vignette {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(120% 90% at 50% 30%, transparent 40%, rgba(31, 28, 36, 0.55) 100%),
-    linear-gradient(180deg, rgba(31, 28, 36, 0.20), transparent 30%, transparent 70%, rgba(31, 28, 36, 0.30));
+    radial-gradient(120% 90% at 50% 30%, transparent 40%, rgba(7, 4, 16, 0.60) 100%),
+    linear-gradient(180deg, rgba(7, 4, 16, 0.25), transparent 30%, transparent 70%, rgba(7, 4, 16, 0.35));
 }
 
 .hub {
   width: 100%;
-  max-width: 460px;                           /* narrow measure ~ readable */
+  max-width: 640px;                           /* wider: taglines fit without wrapping */
   margin: auto;
   padding: clamp(2rem, 7vh, 5rem) clamp(1.1rem, 5vw, 1.5rem) 2.5rem;
   display: flex; flex-direction: column; gap: 1.9rem;
@@ -78,11 +84,22 @@ body {
   color: var(--text-muted);
 }
 
-.services, .socials { display: flex; flex-direction: column; gap: 0.6rem; }
+/* socials live directly under the tagline now */
+.socials { display: flex; flex-direction: row; justify-content: center; gap: 0.7rem; margin-top: 1.15rem; }
+.social {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+.social:hover { background: var(--surface-hi); border-color: var(--border-hi); color: var(--accent); transform: translateY(-2px); }
+.social svg { display: block; width: 18px; height: 18px; }
+
+.services { display: flex; flex-direction: column; gap: 0.6rem; }
 .row {
   display: flex; align-items: center; gap: 0.85rem;
   padding: 0.8rem 0.95rem;
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  background: rgba(var(--surface-rgb), var(--card-alpha)); border: 1px solid var(--border); border-radius: var(--radius);
   color: var(--text); text-decoration: none;
   transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
 }
@@ -96,29 +113,28 @@ body {
 .row__title { font-size: 0.98rem; font-weight: 550; }
 .row__sub { font-size: 0.76rem; color: var(--text-faint); }
 
-.work h2 {
+.featured h2, .work h2 {
   margin: 0 0 0.7rem;
   font-size: 0.7rem; font-weight: 500;
   letter-spacing: 0.26em; text-transform: uppercase; color: var(--text-faint);
 }
 .cards { display: flex; flex-direction: column; gap: 0.6rem; }
-:root { --ok:#5ad17a; --bad:#ff6b6b; --warn:#e3c54a; --mono: ui-monospace,'SFMono-Regular','Cascadia Code',Consolas,monospace; }
-.card__head { flex-wrap: wrap; }
+.card { padding: 0.9rem 1rem; background: rgba(var(--surface-rgb), var(--card-alpha)); border: 1px solid var(--border); border-radius: var(--radius); }
+.featured .card { border-color: rgba(157, 123, 224, 0.30); }   /* a whisper of accent on pinned cards */
+.card__head { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.card__icon { color: var(--accent); display: inline-flex; }
+.card__icon svg { display: block; width: 17px; height: 17px; }
+.card__title { font-size: 0.98rem; font-weight: 550; }
 .card__meta { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--text-faint); font-size: 0.7rem; }
 .card__meta .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px rgba(255,255,255,0.05); }
 .card__meta code { font-family: var(--mono); font-size: 0.68rem; }
 .card__updated { margin: 0.35rem 0 0; font-size: 0.66rem; color: var(--text-faint); }
-.badge-link { text-decoration: none; transition: color 0.16s ease, border-color 0.16s ease; }
-.badge-link:hover { color: var(--accent); border-color: var(--border-hi); }
-.card { padding: 0.9rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
-.card__head { display: flex; align-items: center; gap: 0.5rem; }
-.card__icon { color: var(--accent); display: inline-flex; }
-.card__icon svg { display: block; width: 17px; height: 17px; }
-.card__title { font-size: 0.98rem; font-weight: 550; }
 .badge {
   margin-left: auto; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--text-faint); border: 1px solid var(--border); padding: 0.14rem 0.42rem; border-radius: 999px;
 }
+.badge-link { text-decoration: none; transition: color 0.16s ease, border-color 0.16s ease; }
+.badge-link:hover { color: var(--accent); border-color: var(--border-hi); }
 .card__desc {
   margin: 0.45rem 0 0;
   font-size: calc(0.92rem * var(--scale-body));
@@ -127,16 +143,7 @@ body {
 .cite { font-size: 0.6em; vertical-align: super; margin-left: 0.1em; }
 .cite a { color: var(--accent); text-decoration: none; margin-left: 0.15em; }
 .cite a:hover { text-decoration: underline; }
-
-.socials { flex-direction: row; justify-content: center; gap: 0.7rem; }
-.social {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 40px; height: 40px; border-radius: 50%;
-  background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
-  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
-}
-.social:hover { background: var(--surface-hi); border-color: var(--border-hi); color: var(--accent); transform: translateY(-2px); }
-.social svg { display: block; width: 18px; height: 18px; }
+.recent-empty { font-size: 0.78rem; color: var(--text-faint); margin: 0.5rem 0 0; }
 
 /* references footer */
 .foot { margin-top: 0.4rem; }
@@ -146,8 +153,11 @@ body {
 .refs a { color: var(--accent); text-decoration: none; }
 .refs a:hover { text-decoration: underline; }
 .refs li:target { animation: flash 1.2s ease; }
-@keyframes flash { 0% { background: rgba(255,221,157,0.14); } 100% { background: transparent; } }
+@keyframes flash { 0% { background: rgba(157,123,224,0.16); } 100% { background: transparent; } }
 .copy { text-align: center; font-size: 0.66rem; letter-spacing: 0.08em; color: var(--text-faint); margin: 0; }
+.edge { text-align: center; font-size: 0.62rem; letter-spacing: 0.05em; color: var(--text-faint); margin: 0.5rem 0 0; }
+.edge-link { color: var(--text-faint); text-decoration: none; border-bottom: 1px dotted var(--border); }
+.edge-link:hover { color: var(--accent); }
 
 /* settings button + panel */
 .settings-btn {
@@ -164,10 +174,10 @@ body {
 .settings-panel {
   position: fixed; right: clamp(0.9rem, 3vw, 1.4rem); bottom: calc(44px + 0.8rem); z-index: 21;
   width: min(320px, calc(100vw - 1.8rem));
-  background: rgba(40, 37, 46, 0.92); backdrop-filter: blur(10px);
+  background: rgba(25, 18, 41, 0.92); backdrop-filter: blur(10px);
   border: 1px solid var(--border); border-radius: 16px;
   padding: 1rem 1.1rem; color: var(--text);
-  box-shadow: 0 18px 50px rgba(0,0,0,0.4);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.45);
   transform: translateY(8px) scale(0.98); opacity: 0; pointer-events: none;
   transition: opacity 0.16s ease, transform 0.16s ease;
 }

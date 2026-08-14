@@ -1,16 +1,10 @@
-// colter.dev Worker — serves static assets + a live "Currently working on" tracker.
-// Cron (~10 min) fetches the owner's top-3 most-recently-pushed repos (incl private)
-// via GitHub PAT, writes build-status/commit/updated to KV; the fetch handler SSRs
-// the cards into index.html. Hardcoded cards act as fallback if KV is cold/offline.
-const CUSTOM = {
-  emily: { desc: "“We're stuck at ‘agentic.’ Emily is what comes after.”", cite: true, icon: 'cpu' },
-  coco:  { desc: "A coding agent that ships itself.", icon: 'clip' },
-};
-const EXCLUDE = new Set(["colter.dev"]); // never list the site's own repo
+// colter.dev Worker — static Featured cards + a live "Most Recently Updated" tracker.
+// Cron (~10 min) fetches the owner's 3 most-recently-pushed repos (excl. featured) via GitHub
+// PAT, caches build-status/commit/updated in KV; the fetch handler SSRs them into index.html
+// (under BEGIN_RECENT/END_RECENT) and stamps the Cloudflare edge colo. Static fallback if cold.
+const EXCLUDE = new Set(["colter.dev", "emily", "coco"]); // this site + the pinned (Featured) repos
 
 const ICONS = {
-  cpu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="13" height="13" rx="2"/><path d="M12 9.4v5.2 M9.4 12h5.2 M9 3.5v2 M15 3.5v2 M9 18.5v2 M15 18.5v2 M3.5 9h2 M3.5 15h2 M18.5 9h2 M18.5 15h2"/></svg>',
-  clip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a1 1 0 0 1 1 1v15l-4-2.6-3 2-3-2L4 20V5a1 1 0 0 1 1-1Z"/><path d="M8.5 9.5h7 M8.5 13h4"/></svg>',
   repo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1V7l-3-3H5a1 1 0 0 0-1 1Z"/><path d="M8 8h8 M8 12h8 M8 16h5"/></svg>',
 };
 
@@ -26,22 +20,19 @@ function stateColor(state) {
 
 function renderCards(repos) {
   return repos.map((r) => {
-    const c = CUSTOM[r.name.toLowerCase()];
-    const desc = c ? c.desc : (r.description || "—");
-    const cite = c && c.cite ? '<sup class="cite"><a href="#ref-1" aria-label="reference 1">1</a><a href="#ref-2" aria-label="reference 2">2</a></sup>' : "";
-    const icon = (c && c.icon) ? ICONS[c.icon] : ICONS.repo;
+    const desc = r.description || "—";
     const stateLabel = r.state || "none";
     const badge = r.private
       ? '<span class="badge" aria-label="private repository">private</span>'
       : `<a class="badge badge-link" href="${esc(r.url)}" target="_blank" rel="noopener">repo ↗</a>`;
     return `<article class="card${r.private ? " is-private" : ""}">
       <div class="card__head">
-        <span class="card__icon" aria-hidden="true">${icon}</span>
+        <span class="card__icon" aria-hidden="true">${ICONS.repo}</span>
         <span class="card__title">${esc(r.name)}</span>
         <span class="card__meta" title="build: ${esc(stateLabel)}"><i class="dot" style="background:${stateColor(r.state)}"></i><code>${esc(r.sha || "—")}</code></span>
         ${badge}
       </div>
-      <p class="card__desc">${desc}${cite}</p>
+      <p class="card__desc">${esc(desc)}</p>
       <p class="card__updated">updated ${relTime(r.pushed)}</p>
     </article>`;
   }).join("");
@@ -82,12 +73,17 @@ export default {
 
     let raw = await env.REPOS.get("repos");
     if (!raw) {
-      try { raw = await buildRepos(env); } catch { return res; } // graceful: show static fallback cards
+      try { raw = await buildRepos(env); } catch { raw = null; }
       if (raw) env.REPOS.put("repos", raw, { expirationTtl: 600 }).catch(() => {});
     }
-    if (!raw) return res;
     try {
-      const html = (await res.text()).replace(/<!--BEGIN_CARDS-->[\s\S]*?<!--END_CARDS-->/, renderCards(JSON.parse(raw)));
+      let html = await res.text();
+      if (raw) {
+        const cards = renderCards(JSON.parse(raw));
+        html = html.replace(/<!--BEGIN_RECENT-->[\s\S]*?<!--END_RECENT-->/, cards);
+      }
+      const colo = (req.cf && req.cf.colo) ? req.cf.colo : null;
+      if (colo) html = html.replace(/<span id="edge-colo">[^<]*<\/span>/, `<span id="edge-colo">${esc(colo)}</span>`);
       const headers = new Headers(res.headers);
       headers.set("Cache-Control", "public, max-age=60");
       return new Response(html, { headers });
