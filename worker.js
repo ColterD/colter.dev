@@ -115,13 +115,13 @@ function lorePage(kind) {
       p.refs{font-size:.75rem;color:#8A7DA3;margin-top:1.4rem}a{color:#9D7BE0}
       a.back{display:inline-block;margin-top:1.8rem;font-size:.8rem;color:#8A7DA3;text-decoration:none;border:1px solid #2a2140;padding:.5rem 1rem;border-radius:999px}a.back:hover{color:#9D7BE0}
     </style></head><body><main><h1>${lore.title}</h1><p class="line">${lore.line}</p><p class="body">${lore.body}</p>${lore.refs}<a class="back" href="/">← back to colter.dev</a></main></body></html>`,
-    { headers: { "content-type": "text/html;charset=utf-8", "cache-control": "public, max-age=3600", "x-powered-by": "a coding agent that ships itself", "x-hire-me": "hello@colter.dev" } },
+    { headers: { "content-type": "text/html;charset=utf-8", "cache-control": "public, max-age=3600", "x-built-with": "a coding agent that ships itself", "x-hire-me": "hello@colter.dev" } },
   );
 }
 
 // HTTP header eggs — for exactly the people who read headers
 function headerEggs(headers) {
-  headers.set("X-Powered-By", "a coding agent that ships itself");
+  headers.set("X-Built-With", "a coding agent that ships itself"); // X-Powered-By is stripped by the zone's remove_x-powered-by managed transform
   headers.set("X-Hire-Me", "hello@colter.dev");
   return headers;
 }
