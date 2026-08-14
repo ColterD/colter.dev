@@ -4,6 +4,7 @@
   const root = document.documentElement;
   // each theme's default accent-star color (switching theme resets stars to this; user can re-tweak)
   const THEME_STAR = { regal: "#9D7BE0", dracula: "#BD93F9", nord: "#88C0D0", catppuccin: "#C6A0F6", tokyonight: "#BB9AF7" };
+  const THEME_NAME = { regal: "Regal", dracula: "Dracula", nord: "Nord", catppuccin: "Catppuccin", tokyonight: "Tokyo Night" };
   const defaults = { theme: "regal", anim: "on", star: "#9D7BE0", cardAlpha: 0.7, scaleTitle: 1, scaleTagline: 1, scaleBody: 1 };
 
   const read = () => { try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(LS) || "{}")); } catch { return { ...defaults }; } };
@@ -65,6 +66,11 @@
 
     // theme swatches — switching theme also adopts its accent-star color
     const swatches = panel.querySelectorAll(".swatch");
+    const themeNameEl = document.getElementById("theme-name");
+    // label shows the hovered/focused swatch's name as a preview, else the active theme's name
+    function syncThemeLabel(preview) {
+      if (themeNameEl) themeNameEl.textContent = preview || THEME_NAME[state.theme] || state.theme;
+    }
     swatches.forEach((sw) => {
       sw.addEventListener("click", () => {
         const theme = sw.dataset.theme;
@@ -72,9 +78,14 @@
         starEl.value = star;
         set({ theme, star });
       });
+      sw.addEventListener("mouseenter", () => syncThemeLabel(THEME_NAME[sw.dataset.theme]));
+      sw.addEventListener("mouseleave", () => syncThemeLabel());
+      sw.addEventListener("focus", () => syncThemeLabel(THEME_NAME[sw.dataset.theme]));
+      sw.addEventListener("blur", () => syncThemeLabel());
     });
     function syncSwatches() {
       swatches.forEach((sw) => sw.setAttribute("aria-checked", sw.dataset.theme === state.theme ? "true" : "false"));
+      syncThemeLabel();
     }
 
     function updateLabels() {

@@ -144,6 +144,7 @@ body {
 /* theme swatches */
 .settings-themes { flex-direction: column; align-items: stretch; gap: 0.45rem; }
 .settings-themes__label { color: var(--text-muted); font-size: 0.85rem; }
+.settings-themes__label .theme-name { color: var(--text); font-weight: 550; }
 .theme-swatches { display: flex; gap: 0.5rem; }
 .swatch { position: relative; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border); background: var(--s1); padding: 0; cursor: pointer; transition: transform 0.16s ease, box-shadow 0.16s ease; }
 .swatch::after { content: ""; position: absolute; right: 3px; bottom: 3px; width: 11px; height: 11px; border-radius: 50%; background: var(--s2); }
