@@ -99,8 +99,14 @@ export default {
   },
   async scheduled(_event, env, ctx) {
     ctx.waitUntil((async () => {
-      const data = await buildRepos(env);
-      if (data) await env.REPOS.put("repos", data, { expirationTtl: 7200 });
+      try {
+        const data = await buildRepos(env);
+        if (data) await env.REPOS.put("repos", data, { expirationTtl: 7200 });
+      } catch (err) {
+        // A failed cron (e.g. GitHub non-OK) must not reject silently inside waitUntil:
+        // log it and keep the previous KV value; the next 10-min run retries.
+        console.error("cron buildRepos failed:", err && err.message);
+      }
     })());
   },
 };

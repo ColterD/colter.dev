@@ -18,7 +18,7 @@ A starfield-styled personal homepage built as a **Cloudflare Worker + Static Ass
 
 ## How it works
 
-```
+```text
 request ──► Worker (run_worker_first)
               ├─ ASSETS.fetch() serves static files from public/
               ├─ KV "repos" ──hit──► SSR cards into <!--BEGIN_RECENT-->…<!--END_RECENT-->
@@ -31,7 +31,7 @@ Ranking uses GitHub's `pushed_at` (`sort=pushed`, re-ranked client-side) — `up
 
 ## Repo layout
 
-```
+```text
 worker.js               Worker: SSR tracker + colo stamp + cron
 wrangler.toml           Worker config (assets, KV binding, cron, custom domain)
 public/                 Static assets (served as-is)
@@ -45,15 +45,20 @@ docs/                   feature-ideas.md (researched backlog)
 ## Local development
 
 ```bash
-cp .dev.vars.example .dev.vars    # add your GitHub PAT (repo scope)
+cp .dev.vars.example .dev.vars    # add a GitHub token (see the file for least-privilege guidance)
 npx wrangler dev
 ```
+
+The tracker only needs a **fine-grained PAT, read-only** (Metadata + Contents + Commit statuses), scoped to the repos you want listed — never a classic full-`repo` token.
 
 ## Deploy
 
 ```bash
-npx wrangler deploy               # requires Cloudflare API key + email in env
+npx wrangler login      # interactive, from your own machine
+npx wrangler deploy
 ```
+
+For CI/non-interactive deploys, prefer a **scoped `CLOUDFLARE_API_TOKEN`** (My Profile → API Tokens → "Edit Cloudflare Workers" template). `CLOUDFLARE_API_KEY` + `CLOUDFLARE_EMAIL` (the Global API Key) is a legacy option — avoid it where a scoped token will do.
 
 CI on PRs: CodeQL + Semgrep; CodeRabbit reviews every PR (see [.coderabbit.yaml](.coderabbit.yaml)). All review conversations must be resolved before squash-merge (branch-enforced).
 
