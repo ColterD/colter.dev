@@ -104,7 +104,9 @@ export default {
     try { raw = await env.REPOS.get("repos"); } catch { raw = null; } // a KV read error must never 500 the page
     if (!raw) {
       try { raw = await buildRepos(env); } catch { raw = null; }
-      if (raw) env.REPOS.put("repos", raw, { expirationTtl: 600 }).catch(() => {});
+      // waitUntil: a floating put() can be cancelled once the response returns,
+      // leaving the cache unfilled → every request re-fetches the GitHub API.
+      if (raw) ctx.waitUntil(env.REPOS.put("repos", raw, { expirationTtl: 600 }).catch(() => {}));
     }
     // Health check NEVER blocks the render: on a KV miss the badge stays neutral
     // ("checking…") for this request while the check fills KV in the background.
