@@ -69,7 +69,9 @@
     list.innerHTML = matches.map((c, i) =>
       `<li class="command__opt${i === 0 ? " active" : ""}" role="option" id="cmd-opt-${i}" data-i="${i}" aria-selected="${i === 0 ? "true" : "false"}"><span class="label">${esc(c.label)}</span><span class="hint">${esc(c.hint || "")}</span></li>`
     ).join("");
-    const open = matches.length > 0;
+    // Only open the dropdown when the input actually has focus (click/tab/Cmd+K) —
+    // never on page load, even though default matches are pre-populated.
+    const open = matches.length > 0 && document.activeElement === input;
     list.classList.toggle("open", open);
     input.setAttribute("aria-expanded", open ? "true" : "false");
     input.setAttribute("aria-activedescendant", open ? "cmd-opt-0" : "");

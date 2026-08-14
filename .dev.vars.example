@@ -1,0 +1,5 @@
+# Copy to .dev.vars for `npx wrangler dev` — never commit the real file.
+# Least privilege: a FINE-GRAINED token, read-only — Metadata + Contents +
+# Commit statuses — scoped only to the repos you want the tracker to list.
+# (The Worker never writes to GitHub, so no write scopes, ever.)
+GITHUB_TOKEN=github_pat_yourtokenhere
