@@ -99,8 +99,8 @@
         <li id="ref-2"><span class="ref-n">2</span> Feng et al., “Levels of Autonomy for AI Agents” (2025). <a href="https://arxiv.org/abs/2506.12469" target="_blank" rel="noopener">arXiv:2506.12469</a></li>
       </ol>
       <p class="copy">© <span id="year"></span> Colter Dahlberg</p>
-      <p class="edge">Served from <span id="edge-colo">the edge</span> · <a class="edge-link" href="https://github.com/ColterD/colter.dev" target="_blank" rel="noopener">view source</a></p>
-      <p class="edge">No cookies · no third-party tracking · <a class="edge-link" href="/privacy.txt">privacy</a></p>
+      <p class="edge">Served from <span id="edge-colo">the edge</span> · OmniRoute <span id="llm-status" title="OmniRoute health, checked from the edge"><i class="dot" style="background:var(--text-faint)"></i>checking…</span> · deploy <a id="deploy-sha" class="edge-link" href="https://github.com/ColterD/colter.dev/commits/main">—</a> · <a class="edge-link" href="https://github.com/ColterD/colter.dev" target="_blank" rel="noopener">view source</a></p>
+      <p class="edge">Colter's time <span id="owner-time"></span> · no cookies · no third-party tracking · <a class="edge-link" href="/privacy.txt">privacy</a></p>
     </footer>
   </main>
 
@@ -154,6 +154,13 @@
     window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("year").textContent = new Date().getFullYear();
       requestAnimationFrame(() => document.querySelector(".hub").classList.add("is-in"));
+      // owner-local time (US Central), ticking every 30s
+      const timeEl = document.getElementById("owner-time");
+      if (timeEl) {
+        const fmt = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/Chicago" });
+        const tick = () => { timeEl.textContent = fmt.format(new Date()) + " CT"; };
+        tick(); setInterval(tick, 30000);
+      }
     });
     console.log("%c✦ colter.dev", "color:#9D7BE0;font:600 16px Lexend,system-ui,sans-serif");
     console.log("%cSystems Engineering · AI · Open Source", "color:#8A7DA3;font:400 12px Lexend,system-ui,sans-serif");

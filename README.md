@@ -55,7 +55,7 @@ The tracker only needs a **fine-grained PAT, read-only** (Metadata + Contents + 
 
 ```bash
 npx wrangler login      # interactive, from your own machine
-npx wrangler deploy
+./deploy.sh             # deploys + injects the current commit SHA (shown in the site footer)
 ```
 
 For CI/non-interactive deploys, prefer a **scoped `CLOUDFLARE_API_TOKEN`** (My Profile → API Tokens → "Edit Cloudflare Workers" template). `CLOUDFLARE_API_KEY` + `CLOUDFLARE_EMAIL` (the Global API Key) is a legacy option — avoid it where a scoped token will do.

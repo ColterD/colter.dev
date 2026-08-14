@@ -178,7 +178,9 @@ body {
   letter-spacing: 0.26em; text-transform: uppercase; color: var(--text-faint);
 }
 .cards { display: flex; flex-direction: column; gap: 0.6rem; }
-.card { padding: 0.9rem 1rem; background: rgba(var(--surface-rgb), var(--card-alpha)); border: 1px solid var(--border); border-radius: var(--radius); }
+.card { padding: 0.9rem 1rem; background: rgba(var(--surface-rgb), var(--card-alpha)); border: 1px solid var(--border); border-radius: var(--radius); transition: opacity 0.18s ease; }
+/* hover-dim: focusing one card fades its siblings */
+.cards:hover .card:not(:hover) { opacity: 0.55; }
 .featured .card { border-color: color-mix(in srgb, var(--accent) 30%, transparent); }   /* a whisper of accent on pinned cards */
 .card__head { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .card__icon { color: var(--accent); display: inline-flex; }
@@ -217,6 +219,9 @@ body {
 .edge { text-align: center; font-size: 0.62rem; letter-spacing: 0.05em; color: var(--text-faint); margin: 0.5rem 0 0; }
 .edge-link { color: var(--text-faint); text-decoration: none; border-bottom: 1px dotted var(--border); }
 .edge-link:hover { color: var(--accent); }
+/* footer status dot (OmniRoute health) */
+#llm-status { display: inline-flex; align-items: center; gap: 0.32rem; }
+#llm-status .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
 
 /* settings button + panel */
 .settings-btn {
