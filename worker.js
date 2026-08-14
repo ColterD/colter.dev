@@ -154,6 +154,8 @@ export default {
           .catch(() => {})
       );
     }
+    // clone before consuming: the fallback path needs an unread body
+    const fallback = res.clone();
     try {
       let html = await res.text();
       if (raw) {
@@ -173,7 +175,8 @@ export default {
       headers.set("Cache-Control", "public, max-age=60");
       return new Response(html, { headers: headerEggs(headers) });
     } catch {
-      return res;
+      // degrade to the unmodified page — still carry the header eggs
+      return new Response(fallback.body, { headers: headerEggs(new Headers(fallback.headers)) });
     }
   },
   async scheduled(_event, env, ctx) {

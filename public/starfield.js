@@ -12,6 +12,7 @@
   let enabled = true;                // default ON; settings.js overrides
   let w = 0, h = 0, stars = [], shooters = [];
   let raf = 0, lastShoot = 0, running = false;
+  let burstTimers = [];
 
   const rand = (a, b) => a + Math.random() * (b - a);
 
@@ -86,9 +87,18 @@
 
   // public API for settings.js (user choice overrides the default)
   window.starfield = {
-    setEnabled(on) { enabled = !!on; render(); },
+    setEnabled(on) {
+      enabled = !!on;
+      if (!enabled) { burstTimers.forEach(clearTimeout); burstTimers = []; } // cancel a mid-burst storm
+      render();
+    },
     setColor(rgb) { accentRGB = rgb; if (!enabled) paintStatic(); },
-    // easter-egg comet storm (Konami); no-op when animations are off
-    burst(n = 10) { if (!enabled) return; for (let i = 0; i < n; i++) setTimeout(spawnShooter, i * 180); },
+    // easter-egg comet storm (Konami); each spawn re-checks `enabled` so turning
+    // animations off mid-storm stops it immediately
+    burst(n = 10) {
+      if (!enabled) return;
+      burstTimers = Array.from({ length: n }, (_, i) =>
+        setTimeout(() => { if (enabled) spawnShooter(); }, i * 180));
+    },
   };
 })();

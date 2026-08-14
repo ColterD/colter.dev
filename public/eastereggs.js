@@ -6,6 +6,7 @@
   function toast(msg) {
     const t = document.createElement("div");
     t.className = "toast"; t.textContent = msg;
+    t.setAttribute("role", "status"); t.setAttribute("aria-live", "polite");
     document.body.appendChild(t);
     requestAnimationFrame(() => t.classList.add("show"));
     setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 220); }, 1800);
@@ -49,11 +50,15 @@
     },
     async status() {
       const t0 = performance.now();
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 6000);
       try {
-        const r = await fetch("https://llm.colter.dev/v1/models", { headers: { "User-Agent": "colter.dev cli" } });
+        const r = await fetch("https://llm.colter.dev/v1/models", { signal: ctrl.signal, headers: { "User-Agent": "colter.dev cli" } });
         return `OmniRoute ${r.ok ? "up" : "degraded"} · ${Math.round(performance.now() - t0)}ms (llm.colter.dev)`;
       } catch {
         return "OmniRoute unreachable";
+      } finally {
+        clearTimeout(timer);
       }
     },
     source() {
