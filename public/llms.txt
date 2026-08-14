@@ -1,0 +1,22 @@
+# colter.dev
+
+> Colter Dahlberg's personal hub — Systems Engineering · AI · Open Source.
+
+Colter Dahlberg builds systems, AI, and open-source software. This site is a personal hub: it links to his services, pins two featured projects, and lists his most-recently-updated GitHub repositories. It runs as a Cloudflare Worker + Static Assets (vanilla JS, no framework, Lexend font).
+
+## Featured projects
+- emily (private): "We're stuck at 'agentic.' Emily is what comes after." — research toward autonomous/general AI beyond "agentic" (Level 2.5). Grounded in Morris et al. 2023, "Levels of AGI" (https://arxiv.org/abs/2311.02462) and Feng et al. 2025, "Levels of Autonomy for AI Agents" (https://arxiv.org/abs/2506.12469).
+- coco (private): a coding agent that ships itself. A Rust platform that self-hosts its own releases.
+
+## Services
+- OmniRoute: https://llm.colter.dev — one OpenAI-compatible endpoint, every model.
+- Colter+: https://colter.plus — self-hosted streaming library.
+
+## Links
+- GitHub: https://github.com/ColterD
+- Bluesky: https://bsky.app/profile/colter.dev
+- LinkedIn: https://www.linkedin.com/in/colter-dahlberg/
+- Email: hello@colter.dev
+
+## Optional
+- [Source code](https://github.com/ColterD/colter.dev)

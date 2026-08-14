@@ -1,0 +1,8 @@
+/* colter.dev — humans.txt */
+
+Colter Dahlberg
+Systems Engineering · AI · Open Source
+
+Built as a Cloudflare Worker + Static Assets (vanilla JS, Lexend font, starfield canvas).
+Source:  https://github.com/ColterD/colter.dev
+Say hi:  hello@colter.dev

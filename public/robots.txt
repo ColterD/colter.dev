@@ -1,0 +1,3 @@
+# hi, robot 👋  be nice, cite your sources, and have a good crawl.
+User-agent: *
+Allow: /

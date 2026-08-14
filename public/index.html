@@ -29,6 +29,13 @@
       </nav>
     </header>
 
+    <div class="command" id="command">
+      <span class="command__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></span>
+      <input id="command-input" class="command__input" type="text" placeholder="Search or jump to…  emily, OmniRoute, email" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="command-list" aria-autocomplete="list" aria-label="Search or jump to" />
+      <kbd class="command__kbd" aria-hidden="true">⌘K</kbd>
+      <ul id="command-list" class="command__list" role="listbox" aria-label="Quick actions"></ul>
+    </div>
+
     <nav class="services" aria-label="Services">
       <a class="row" href="https://llm.colter.dev/" target="_blank" rel="noopener">
         <span class="row__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.4"/><circle cx="18" cy="5" r="2.4"/><path d="M8.1 17.9 16 8 M12 19h6 M6 5H4"/></svg></span>
@@ -80,6 +87,7 @@
       </ol>
       <p class="copy">© <span id="year"></span> Colter Dahlberg</p>
       <p class="edge">Served from <span id="edge-colo">the edge</span> · <a class="edge-link" href="https://github.com/ColterD/colter.dev" target="_blank" rel="noopener">view source</a></p>
+      <p class="edge">No cookies · no third-party tracking · <a class="edge-link" href="/privacy.txt">privacy</a></p>
     </footer>
   </main>
 
@@ -118,6 +126,7 @@
 
   <script src="starfield.js" defer></script>
   <script src="settings.js" defer></script>
+  <script src="command.js" defer></script>
   <script>
     window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("year").textContent = new Date().getFullYear();

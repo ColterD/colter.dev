@@ -1,0 +1,13 @@
+colter.dev — privacy
+=====================
+This site sets no cookies and runs no third-party analytics or tracking scripts.
+
+It is a static Cloudflare Worker. The only data logged is what Cloudflare's edge
+records in the normal course of serving the request (standard CDN/edge logs) —
+no visitor-behaviour profile is built or sold.
+
+GitHub repository data shown on the page is fetched server-side from the public
+GitHub API and cached at the edge; no client-side tracking is involved.
+
+Source:  https://github.com/ColterD/colter.dev
+Contact: hello@colter.dev
