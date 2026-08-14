@@ -69,6 +69,29 @@ async function buildRepos(env) {
   return JSON.stringify(out);
 }
 
+// --- OmniRoute uptime (self-check from the edge; public /v1 is Access-bypassed) ---
+const LLM_CHECK_URL = "https://llm.colter.dev/v1/models";
+const LLM_TIMEOUT_MS = 8000;
+
+async function checkLlm() {
+  const t0 = Date.now();
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), LLM_TIMEOUT_MS);
+  try {
+    const r = await fetch(LLM_CHECK_URL, { signal: ctrl.signal, headers: { "User-Agent": "colter.dev status" } });
+    return { ok: r.ok, ms: Date.now() - t0, ts: Date.now() };
+  } catch {
+    return { ok: false, ms: 0, ts: Date.now() };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+function llmBadge(s) {
+  if (!s) return '<i class="dot" style="background:var(--text-faint)"></i>checking…';
+  const dot = `<i class="dot" style="background:${s.ok ? "var(--ok)" : "var(--bad)"}"></i>`;
+  return `${dot}${s.ok ? "up · " + s.ms + "ms" : "down"}`;
+}
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
@@ -82,6 +105,11 @@ export default {
       try { raw = await buildRepos(env); } catch { raw = null; }
       if (raw) env.REPOS.put("repos", raw, { expirationTtl: 600 }).catch(() => {});
     }
+    let llm = await env.REPOS.get("llm-status", { type: "json" });
+    if (!llm) {
+      llm = await checkLlm();
+      env.REPOS.put("llm-status", JSON.stringify(llm), { expirationTtl: 600 }).catch(() => {});
+    }
     try {
       let html = await res.text();
       if (raw) {
@@ -90,6 +118,13 @@ export default {
       }
       const colo = (req.cf && req.cf.colo) ? req.cf.colo : null;
       if (colo) html = html.replace(/<span id="edge-colo">[^<]*<\/span>/, `<span id="edge-colo">${esc(colo)}</span>`);
+      const sha = env.COMMIT_SHA ? String(env.COMMIT_SHA) : "";
+      if (sha) {
+        html = html.replace(/<a id="deploy-sha"[^>]*>[^<]*<\/a>/,
+          `<a id="deploy-sha" class="edge-link" href="https://github.com/ColterD/colter.dev/commit/${esc(sha)}" target="_blank" rel="noopener">${esc(sha)}</a>`);
+      }
+      html = html.replace(/<span id="llm-status"[^>]*>[\s\S]*?<\/span>/,
+        `<span id="llm-status" title="OmniRoute health, checked from the edge">${llmBadge(llm)}</span>`);
       const headers = new Headers(res.headers);
       headers.set("Cache-Control", "public, max-age=60");
       return new Response(html, { headers });
@@ -106,6 +141,12 @@ export default {
         // A failed cron (e.g. GitHub non-OK) must not reject silently inside waitUntil:
         // log it and keep the previous KV value; the next 10-min run retries.
         console.error("cron buildRepos failed:", err && err.message);
+      }
+      try {
+        const llm = await checkLlm();
+        await env.REPOS.put("llm-status", JSON.stringify(llm), { expirationTtl: 7200 });
+      } catch (err) {
+        console.error("cron checkLlm failed:", err && err.message);
       }
     })());
   },
