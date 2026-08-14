@@ -43,10 +43,10 @@
       </nav>
     </header>
 
-    <div class="command" id="command">
+    <div class="command" id="command" inert role="dialog" aria-modal="false" aria-label="Command palette">
       <span class="command__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></span>
       <input id="command-input" class="command__input" type="text" placeholder="Search or jump to…  emily, OmniRoute, email" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="command-list" aria-autocomplete="list" aria-label="Search or jump to" />
-      <kbd class="command__kbd" aria-hidden="true">⌘K</kbd>
+      <kbd class="command__kbd" aria-hidden="true">esc to close</kbd>
       <ul id="command-list" class="command__list" role="listbox" aria-label="Quick actions"></ul>
     </div>
 
@@ -100,8 +100,11 @@
         <li id="ref-2"><span class="ref-n">2</span> Feng et al., “Levels of Autonomy for AI Agents” (2025). <a href="https://arxiv.org/abs/2506.12469" target="_blank" rel="noopener">arXiv:2506.12469</a></li>
       </ol>
       <p class="copy">© <span id="year"></span> Colter Dahlberg</p>
-      <p class="edge">Served from <span id="edge-colo">the edge</span> · OmniRoute <span id="llm-status" title="OmniRoute health, checked from the edge"><i class="dot" style="background:var(--text-faint)"></i>checking…</span> · deploy <a id="deploy-sha" class="edge-link" href="https://github.com/ColterD/colter.dev/commits/main">—</a> · <a class="edge-link" href="https://github.com/ColterD/colter.dev" target="_blank" rel="noopener">view source</a></p>
-      <p class="edge">Colter's time <span id="owner-time"></span> · no cookies · no third-party tracking · <a class="edge-link" href="/privacy.txt">privacy</a></p>
+      <p class="edge">Served with <span aria-hidden="true">❤️</span><span class="sr-only">love</span> from <span id="edge-colo">the edge</span> in <span id="edge-ms">—</span> ms</p>
+      <p class="edge">OmniRoute <span id="llm-status" title="OmniRoute health, checked from the edge"><i class="dot" style="background:var(--text-faint)"></i>checking…</span> · Colter+ <span id="cp-status" title="Colter+ health, checked from the edge"><i class="dot" style="background:var(--text-faint)"></i>checking…</span></p>
+      <p class="edge">deploy <a id="deploy-sha" class="edge-link" href="https://github.com/ColterD/colter.dev/commits/main">—</a> · <a class="edge-link" href="https://github.com/ColterD/colter.dev" target="_blank" rel="noopener">view source</a></p>
+      <p class="edge">Colter's time: <span id="owner-time"></span></p>
+      <p class="edge">no cookies · no third-party tracking · <a class="edge-link" href="/privacy.txt">privacy</a></p>
     </footer>
   </main>
 
@@ -159,8 +162,8 @@
       // owner-local time (US Central), ticking every 30s
       const timeEl = document.getElementById("owner-time");
       if (timeEl) {
-        const fmt = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/Chicago" });
-        const tick = () => { timeEl.textContent = fmt.format(new Date()) + " CT"; };
+        const fmt = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "America/Chicago" });
+        const tick = () => { timeEl.textContent = fmt.format(new Date()).toLowerCase() + " CT"; };
         tick(); setInterval(tick, 30000);
       }
     });

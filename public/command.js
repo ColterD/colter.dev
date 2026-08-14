@@ -94,15 +94,31 @@
     if (e.key === "ArrowDown") { e.preventDefault(); setActive(active + 1); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setActive(active - 1); }
     else if (e.key === "Enter") { e.preventDefault(); runActive(); }
-    else if (e.key === "Escape") { clear(); }
+    else if (e.key === "Escape") { closeCmd(); }
   });
   list.addEventListener("click", (e) => { const opt = e.target.closest(".command__opt"); if (opt) { active = +opt.dataset.i; runActive(); } });
   list.addEventListener("mousemove", (e) => { const opt = e.target.closest(".command__opt"); if (opt) setActive(+opt.dataset.i); });
 
+  // The palette is an overlay, hidden by default: Cmd/Ctrl+K toggles it.
+  // (Deliberately not wired into the settings panel — that's for a11y controls;
+  // a hidden ⌘K palette is the standard pattern and ready to grow.)
+  function openCmd() {
+    root.classList.add("open"); root.inert = false;
+    input.focus(); input.select(); render(input.value);
+  }
+  function closeCmd() {
+    clear();
+    root.classList.remove("open"); root.inert = true;
+  }
   document.addEventListener("keydown", (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); input.focus(); input.select(); }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      root.classList.contains("open") ? closeCmd() : openCmd();
+    }
   });
-  document.addEventListener("click", (e) => { if (!root.contains(e.target)) list.classList.remove("open"); });
+  document.addEventListener("click", (e) => {
+    if (root.classList.contains("open") && !root.contains(e.target)) closeCmd();
+  });
 
   render("");
 })();
