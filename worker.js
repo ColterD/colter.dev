@@ -93,7 +93,7 @@ function llmBadge(s) {
 }
 
 export default {
-  async fetch(req, env) {
+  async fetch(req, env, ctx) {
     const url = new URL(req.url);
     const res = await env.ASSETS.fetch(req);
     const ct = res.headers.get("content-type") || "";
@@ -105,10 +105,15 @@ export default {
       try { raw = await buildRepos(env); } catch { raw = null; }
       if (raw) env.REPOS.put("repos", raw, { expirationTtl: 600 }).catch(() => {});
     }
+    // Health check NEVER blocks the render: on a KV miss the badge stays neutral
+    // ("checking…") for this request while the check fills KV in the background.
     let llm = await env.REPOS.get("llm-status", { type: "json" });
     if (!llm) {
-      llm = await checkLlm();
-      env.REPOS.put("llm-status", JSON.stringify(llm), { expirationTtl: 600 }).catch(() => {});
+      ctx.waitUntil(
+        checkLlm()
+          .then((s) => env.REPOS.put("llm-status", JSON.stringify(s), { expirationTtl: 600 }))
+          .catch(() => {})
+      );
     }
     try {
       let html = await res.text();

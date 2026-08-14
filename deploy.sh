@@ -6,6 +6,13 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# Refuse dirty trees: the footer SHA must match the deployed content exactly.
+if ! git diff-index --quiet HEAD --; then
+  echo "ERROR: working tree has uncommitted changes — commit or stash first." >&2
+  git status --short >&2
+  exit 1
+fi
+
 SHA="$(git rev-parse --short HEAD)"
 echo "deploying commit ${SHA}"
 exec npx wrangler deploy --var "COMMIT_SHA:${SHA}"
