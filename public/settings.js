@@ -1,9 +1,10 @@
-// colter.dev — settings / accessibility panel (v2: royal-purple accent + card opacity)
-// Persists in localStorage; controls animations, accent-star color, card opacity, per-type text size.
+// colter.dev — settings / accessibility panel (v2: theme + accent + card opacity)
 (() => {
   const LS = "colterdev.settings.v2";
   const root = document.documentElement;
-  const defaults = { anim: "on", star: "#9D7BE0", cardAlpha: 0.7, scaleTitle: 1, scaleTagline: 1, scaleBody: 1 };
+  // each theme's default accent-star color (switching theme resets stars to this; user can re-tweak)
+  const THEME_STAR = { regal: "#9D7BE0", dracula: "#BD93F9", nord: "#88C0D0", catppuccin: "#C6A0F6", tokyonight: "#BB9AF7" };
+  const defaults = { theme: "regal", anim: "on", star: "#9D7BE0", cardAlpha: 0.7, scaleTitle: 1, scaleTagline: 1, scaleBody: 1 };
 
   const read = () => { try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(LS) || "{}")); } catch { return { ...defaults }; } };
   const write = (s) => localStorage.setItem(LS, JSON.stringify(s));
@@ -17,17 +18,14 @@
   };
 
   function apply() {
-    // animations (default ON; user can disable)
+    root.dataset.theme = state.theme;
     const animOn = state.anim === "on";
     root.classList.toggle("anim-off", !animOn);
     if (window.starfield) window.starfield.setEnabled(animOn);
-    // accent (rare) star + comet color
     const starRgb = hexToRgb(state.star) || "157, 123, 224";
     root.style.setProperty("--star-rgb", starRgb);
     if (window.starfield) window.starfield.setColor(starRgb);
-    // card / row panel opacity
     root.style.setProperty("--card-alpha", String(state.cardAlpha));
-    // text scales
     root.style.setProperty("--scale-title", String(state.scaleTitle));
     root.style.setProperty("--scale-tagline", String(state.scaleTagline));
     root.style.setProperty("--scale-body", String(state.scaleBody));
@@ -43,8 +41,7 @@
     btn.addEventListener("click", () => panel.classList.contains("open") ? close() : open());
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && panel.classList.contains("open")) close(); });
 
-    // wire controls + persist
-    const set = (patch) => { state = { ...state, ...patch }; write(state); apply(); };
+    const set = (patch) => { state = { ...state, ...patch }; write(state); apply(); syncSwatches(); };
 
     const animEl = document.getElementById("set-anim");
     const starEl = document.getElementById("set-star");
@@ -53,7 +50,6 @@
     const sTag = document.getElementById("set-scale-tagline");
     const sBody = document.getElementById("set-scale-body");
 
-    // initialize control values from state
     animEl.checked = state.anim === "on";
     starEl.value = state.star;
     cardEl.value = state.cardAlpha;
@@ -67,6 +63,20 @@
       el.addEventListener("input", () => { set({ [key]: parseFloat(el.value) }); updateLabels(); });
     });
 
+    // theme swatches — switching theme also adopts its accent-star color
+    const swatches = panel.querySelectorAll(".swatch");
+    swatches.forEach((sw) => {
+      sw.addEventListener("click", () => {
+        const theme = sw.dataset.theme;
+        const star = THEME_STAR[theme] || state.star;
+        starEl.value = star;
+        set({ theme, star });
+      });
+    });
+    function syncSwatches() {
+      swatches.forEach((sw) => sw.setAttribute("aria-checked", sw.dataset.theme === state.theme ? "true" : "false"));
+    }
+
     function updateLabels() {
       document.getElementById("set-card-val").textContent = Math.round(state.cardAlpha * 100) + "%";
       document.getElementById("set-scale-title-val").textContent = Math.round(state.scaleTitle * 100) + "%";
@@ -77,9 +87,10 @@
     document.getElementById("set-reset").addEventListener("click", () => {
       state = { ...defaults }; write(state);
       animEl.checked = true; starEl.value = state.star; cardEl.value = state.cardAlpha;
-      sTitle.value = sTag.value = sBody.value = 1; updateLabels(); apply();
+      sTitle.value = sTag.value = sBody.value = 1; updateLabels(); apply(); syncSwatches();
     });
 
     apply();
+    syncSwatches();
   });
 })();
