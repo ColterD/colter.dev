@@ -88,5 +88,7 @@
   window.starfield = {
     setEnabled(on) { enabled = !!on; render(); },
     setColor(rgb) { accentRGB = rgb; if (!enabled) paintStatic(); },
+    // easter-egg comet storm (Konami); no-op when animations are off
+    burst(n = 10) { if (!enabled) return; for (let i = 0; i < n; i++) setTimeout(spawnShooter, i * 180); },
   };
 })();
