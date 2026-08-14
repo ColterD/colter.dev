@@ -1,8 +1,63 @@
-# CodeRabbit — free AI code review for public repos. https://docs.coderabbit.ai
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit — config reference: https://docs.coderabbit.ai/reference/configuration
+# House rule: every conversation this review opens must be resolved before squash-merge.
 language: en-US
+early_access: false
+
 reviews:
+  # assertive = surface nitpicks too; they all get resolved before merge anyway.
+  # Dial to "chill" if review volume ever outweighs value. (quiet|chill|assertive)
+  profile: assertive
+  request_changes_workflow: false   # merge-gating is handled by branch protection
+  high_level_summary: true
+  review_status: true
+  review_details: true
+  poem: false                       # keep reviews focused
+  collapse_walkthrough: false
+  sequence_diagrams: false          # tiny static site; diagrams are noise
+  estimate_code_review_effort: true
   auto_review:
     enabled: true
     drafts: false
+  path_instructions:
+    - path: "worker.js"
+      instructions: |
+        Cloudflare Worker (ES modules): serves assets, SSRs the "Most Recently Updated"
+        tracker between the BEGIN_RECENT/END_RECENT markers, stamps the edge colo.
+        - Flag anything that could regress run_worker_first SSR or the markers.
+        - GitHub API paths must handle non-OK responses and degrade gracefully.
+        - Ranking must use pushed_at (sort=pushed + re-rank), never updated_at
+          (GitHub does not keep updated_at in sync with pushes).
+    - path: "public/**.js"
+      instructions: |
+        Vanilla JS, no framework, no build step — keep it that way.
+        - No new runtime dependencies; ES2019+ only.
+        - Respect prefers-reduced-motion and the settings-panel anim-off class.
+    - path: "public/**.css"
+      instructions: |
+        Design tokens live in :root (Regal default) + [data-theme] override blocks.
+        - Color must flow through var(--accent) / color-mix, never hardcoded hex
+          outside the theme definitions themselves.
+        - WCAG AA (>=4.5:1 body text, >=3:1 large UI) on every theme.
+    - path: "public/index.html"
+      instructions: |
+        - og/twitter meta must stay complete and in sync
+          (og:image:alt mirrors twitter:image:alt).
+        - Settings-panel controls need labels + aria wiring; keep inert semantics.
   path_filters:
-    - "!public/fonts/**"
+    - "!public/fonts/**"            # vendored font binary
+    - "!public/og.png"              # generated asset; source of truth is og.html
+  unit_tests:
+    enabled: false                  # no test framework on this site (yet)
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  web_search:
+    enabled: true                   # verify API/spec claims (caught twitter:image:alt, WCAG)
+  code_guidelines:
+    enabled: false                  # flip on when docs/code-guidelines.md exists
+  learnings:
+    scope: local                    # this repo's conventions stay repo-local
+  automatic_repository_linking: false

@@ -48,9 +48,15 @@ async function gh(path, token) {
 async function buildRepos(env) {
   const token = env.GITHUB_TOKEN;
   if (!token) return null;
-  const all = await gh("/user/repos?sort=updated&per_page=30&affiliation=owner", token);
+  // sort=pushed ranks by pushed_at (actual code changes). sort=updated ranks by updated_at,
+  // which GitHub does NOT keep in sync with pushes (e.g. screenarr: pushed recently, updated_at
+  // stuck weeks earlier) — that produced a stale-looking "Most Recently Updated" list.
+  const all = await gh("/user/repos?sort=pushed&per_page=30&affiliation=owner", token);
   if (!Array.isArray(all)) return null;
-  const top = all.filter((r) => !EXCLUDE.has(r.name)).slice(0, 3);
+  const top = all
+    .filter((r) => !EXCLUDE.has(r.name))
+    .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at)) // re-rank: don't trust list order
+    .slice(0, 3);
   const out = [];
   for (const r of top) {
     const branch = r.default_branch || "main";
