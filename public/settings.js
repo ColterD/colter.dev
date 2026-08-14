@@ -4,6 +4,7 @@
   const root = document.documentElement;
   // each theme's default accent-star color (switching theme resets stars to this; user can re-tweak)
   const THEME_STAR = { regal: "#9D7BE0", dracula: "#BD93F9", nord: "#88C0D0", catppuccin: "#C6A0F6", tokyonight: "#BB9AF7" };
+  const THEME_NAME = { regal: "Regal", dracula: "Dracula", nord: "Nord", catppuccin: "Catppuccin", tokyonight: "Tokyo Night" };
   const defaults = { theme: "regal", anim: "on", star: "#9D7BE0", cardAlpha: 0.7, scaleTitle: 1, scaleTagline: 1, scaleBody: 1 };
 
   const read = () => { try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(LS) || "{}")); } catch { return { ...defaults }; } };
@@ -65,6 +66,15 @@
 
     // theme swatches — switching theme also adopts its accent-star color
     const swatches = panel.querySelectorAll(".swatch");
+    const themeNameEl = document.getElementById("theme-name");
+    // Label previews the hovered swatch's name, else the focused swatch's (keyboard), else the
+    // active theme. hover and focus are tracked independently so ending one (e.g. the mouse
+    // leaving a keyboard-focused swatch) doesn't clobber the other's preview.
+    let hoverTheme = null, focusTheme = null;
+    function syncThemeLabel() {
+      const text = hoverTheme || focusTheme || THEME_NAME[state.theme] || state.theme;
+      if (themeNameEl) themeNameEl.textContent = text;
+    }
     swatches.forEach((sw) => {
       sw.addEventListener("click", () => {
         const theme = sw.dataset.theme;
@@ -72,9 +82,14 @@
         starEl.value = star;
         set({ theme, star });
       });
+      sw.addEventListener("mouseenter", () => { hoverTheme = THEME_NAME[sw.dataset.theme] || null; syncThemeLabel(); });
+      sw.addEventListener("mouseleave", () => { hoverTheme = null; syncThemeLabel(); });
+      sw.addEventListener("focus", () => { focusTheme = THEME_NAME[sw.dataset.theme] || null; syncThemeLabel(); });
+      sw.addEventListener("blur", () => { focusTheme = null; syncThemeLabel(); });
     });
     function syncSwatches() {
       swatches.forEach((sw) => sw.setAttribute("aria-checked", sw.dataset.theme === state.theme ? "true" : "false"));
+      syncThemeLabel();
     }
 
     function updateLabels() {
