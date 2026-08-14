@@ -277,3 +277,4 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid 
   .row:hover, .social:hover, .settings-btn:hover { transform: none !important; }
 }
 .anim-off .js .hub > *, .anim-off .hub > * { opacity: 1 !important; transform: none !important; transition: none !important; }
+.anim-off .toast { transition: none !important; }   /* toast appears instantly when animations are off */

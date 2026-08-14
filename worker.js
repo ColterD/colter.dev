@@ -92,9 +92,44 @@ function llmBadge(s) {
   return `${dot}${s.ok ? "up · " + s.ms + "ms" : "down"}`;
 }
 
+// --- hidden lore pages (easter eggs) ---
+function lorePage(kind) {
+  const lore = {
+    emily: {
+      title: "emily",
+      line: "We're stuck at 'agentic.' Emily is what comes after.",
+      body: "A research project pushing past Level-2.5 'agentic' AI toward autonomous, general, innovative systems — grounded in the levels-of-AI literature, not marketing.",
+      refs: '<p class="refs">Morris et al. 2023, <a href="https://arxiv.org/abs/2311.02462" rel="noopener">Levels of AGI</a> · Feng et al. 2025, <a href="https://arxiv.org/abs/2506.12469" rel="noopener">Levels of Autonomy for AI Agents</a></p>',
+    },
+    coco: {
+      title: "coco",
+      line: "A coding agent that ships itself.",
+      body: "A Rust coding-agent platform that self-hosts its own releases — its ops pipeline is its own first user.",
+      refs: "",
+    },
+  }[kind];
+  return new Response(
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>${lore.title} · colter.dev</title><style>
+      body{margin:0;min-height:100svh;display:flex;align-items:center;justify-content:center;background:#0E0A1A;color:#F3EEFA;font-family:'Lexend',system-ui,sans-serif;text-align:center;padding:2rem}
+      main{max-width:34rem}h1{font-size:2.2rem;margin:0}p.line{font-size:1.15rem;color:#C6B8DC;margin:.6rem 0 1rem}p.body{font-size:.95rem;line-height:1.6;color:#8A7DA3}
+      p.refs{font-size:.75rem;color:#8A7DA3;margin-top:1.4rem}a{color:#9D7BE0}
+      a.back{display:inline-block;margin-top:1.8rem;font-size:.8rem;color:#8A7DA3;text-decoration:none;border:1px solid #2a2140;padding:.5rem 1rem;border-radius:999px}a.back:hover{color:#9D7BE0}
+    </style></head><body><main><h1>${lore.title}</h1><p class="line">${lore.line}</p><p class="body">${lore.body}</p>${lore.refs}<a class="back" href="/">← back to colter.dev</a></main></body></html>`,
+    { headers: { "content-type": "text/html;charset=utf-8", "cache-control": "public, max-age=3600", "x-powered-by": "a coding agent that ships itself", "x-hire-me": "hello@colter.dev" } },
+  );
+}
+
+// HTTP header eggs — for exactly the people who read headers
+function headerEggs(headers) {
+  headers.set("X-Powered-By", "a coding agent that ships itself");
+  headers.set("X-Hire-Me", "hello@colter.dev");
+  return headers;
+}
+
 export default {
   async fetch(req, env, ctx) {
     const url = new URL(req.url);
+    if (url.pathname === "/emily" || url.pathname === "/coco") return lorePage(url.pathname.slice(1));
     const res = await env.ASSETS.fetch(req);
     const ct = res.headers.get("content-type") || "";
     const isHTML = (url.pathname === "/" || url.pathname === "/index.html") && ct.includes("text/html");
@@ -119,6 +154,8 @@ export default {
           .catch(() => {})
       );
     }
+    // clone before consuming: the fallback path needs an unread body
+    const fallback = res.clone();
     try {
       let html = await res.text();
       if (raw) {
@@ -136,9 +173,11 @@ export default {
         `<span id="llm-status" title="OmniRoute health, checked from the edge">${llmBadge(llm)}</span>`);
       const headers = new Headers(res.headers);
       headers.set("Cache-Control", "public, max-age=60");
-      return new Response(html, { headers });
+      return new Response(html, { status: res.status, statusText: res.statusText, headers: headerEggs(headers) });
     } catch {
-      return res;
+      // degrade to the unmodified page — still carry the header eggs; keep the
+      // original status so a 404/500 from assets isn't masked as 200
+      return new Response(fallback.body, { status: fallback.status, statusText: fallback.statusText, headers: headerEggs(new Headers(fallback.headers)) });
     }
   },
   async scheduled(_event, env, ctx) {

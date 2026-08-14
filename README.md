@@ -15,6 +15,7 @@ A starfield-styled personal homepage built as a **Cloudflare Worker + Static Ass
 - 🖼️ **OG/social card** — every share gets the starfield+comet card ([og.png](public/og.png), regenerated from [og.html](og.html))
 - 🤖 **AI-discoverable** — [`llms.txt`](public/llms.txt) + markdown-friendly content
 - 🔒 **No cookies, no third-party tracking** — see [privacy.txt](public/privacy.txt); `security.txt` at `/.well-known/security.txt`
+- 🥚 **Easter eggs** — `window.colter` in the console, hidden `/emily` + `/coco` pages, HTTP header eggs, Konami code, tab-title play
 
 ## How it works
 
