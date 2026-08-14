@@ -15,7 +15,7 @@
   // 1. Konami code (↑↑↓↓←→←→BA) → Emily boot: a comet storm + a console line.
   //    Entering it twice within 6s engages warp.
   const SEQ = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
-  let idx = 0, lastKonami = 0;
+  let idx = 0, lastKonami = -1e9; // NOT 0: performance.now() starts near 0, so a first-code-within-6s-of-load would false-trigger warp
   document.addEventListener("keydown", (e) => {
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     idx = (k === SEQ[idx]) ? idx + 1 : (k === SEQ[0] ? 1 : 0);

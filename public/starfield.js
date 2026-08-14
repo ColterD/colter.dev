@@ -279,13 +279,18 @@
     },
 
     { // SHOWER — date-triggered comet showers (New Year, site anniversary); fans of comets
-      name: "shower",
+      name: "shower", dayKey: "", dayCheckedAt: 0,
+      isShowerDay(t) {
+        if (t - this.dayCheckedAt > 1000) { // the date changes at most once/day; don't allocate per frame
+          const d = new Date();
+          this.dayKey = (d.getMonth() + 1) + "-" + d.getDate();
+          this.dayCheckedAt = t;
+        }
+        return this.dayKey === "1-1" || this.dayKey === "8-13"; // add "month-day" strings for more
+      },
       frame(F) {
         const { t } = F;
-        const today = new Date();
-        const key = (today.getMonth() + 1) + "-" + today.getDate();
-        const dates = new Set(["1-1", "8-13"]);       // add "month-day" strings for more
-        if (!dates.has(key)) return;
+        if (!this.isShowerDay(t)) return;
         if (t - lastShoot > 1400 && shooters.length < 6 && Math.random() < 0.9) {
           spawnShooter(Math.random() < 0.35);          // 35% triple-fan
           lastShoot = t;
@@ -299,7 +304,7 @@
   function drawStars(t, warpE) {
     const dx = Math.cos(145 * Math.PI / 180), dy = Math.sin(145 * Math.PI / 180);
     for (const s of stars) {
-      // parallax offset by depth (deepest stars move least); skipped while warping
+      // parallax offset by depth (deepest stars move least); applies to dots and warp streaks alike
       const depth = s.spd <= 0.02 ? 0.35 : s.spd <= 0.035 ? 0.7 : 1.25;
       const px = s.x + par.x * depth, py = s.y + par.y * depth;
       const rgb = s.rare ? accentRGB : WHITE;
@@ -335,9 +340,10 @@
     // planets → satellite → supernova → spaceship → shower, then stars on top
     for (const f of FEATURES) f.frame && f.frame(F);
 
-    // stars move (warp multiplies drift)
+    // stars move (warp multiplies drift); dt*60 = per-frame-equivalent at 60Hz,
+    // so tuned speeds hold on 120Hz+ displays
     const dx = Math.cos(145 * Math.PI / 180), dy = Math.sin(145 * Math.PI / 180);
-    const mult = 1 + warpE * 26;
+    const mult = (1 + warpE * 26) * dt * 60;
     for (const s of stars) {
       s.x += dx * s.spd * mult; s.y += dy * s.spd * mult;
       if (s.x < -4) s.x = w + 4; else if (s.x > w + 4) s.x = -4;
@@ -348,7 +354,7 @@
     // regular comets (skipped while shower feature is spawning its own / warping)
     if (warpE <= 0 && t - lastShoot > 4500 && Math.random() < 0.7 && shooters.length < 2) { spawnShooter(false); lastShoot = t; }
     for (let i = shooters.length - 1; i >= 0; i--) {
-      const m = shooters[i]; m.life += 16; m.x += m.vx; m.y += m.vy;
+      const m = shooters[i]; m.life += dt * 1000; m.x += m.vx * dt * 60; m.y += m.vy * dt * 60;
       const k = m.life / m.max, op = k < 0.15 ? k / 0.15 : k > 0.8 ? (1 - k) / 0.2 : 1;
       const txx = m.x - m.vx * 9, ty = m.y - m.vy * 9;
       const g = ctx.createLinearGradient(m.x, m.y, txx, ty);
