@@ -67,7 +67,7 @@ Worker-native flexes (#45 edge OG images, #62 served-from-PoP ✅DONE, #52 real 
 53. `humans.txt`. low / none
 54. `robots.txt` personality. low / none
 55. HTML-comment source eggs. low / none
-56. HTTP header eggs (`X-Hire-Me`, `X-Powered-By`). low / Worker (have)
+56. HTTP header eggs (`X-Hire-Me`, `X-Built-With` — NOT `X-Powered-By`, which the zone's Cloudflare managed transform strips). low / Worker (have) — ✅ DONE
 57. Invisible selectable text (margin notes). low / none
 58. Tab-title play (boot/come-back-on-blur). low / none
 59. `/random`. low / none
