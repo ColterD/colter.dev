@@ -94,15 +94,38 @@
     if (e.key === "ArrowDown") { e.preventDefault(); setActive(active + 1); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setActive(active - 1); }
     else if (e.key === "Enter") { e.preventDefault(); runActive(); }
-    else if (e.key === "Escape") { clear(); }
+    else if (e.key === "Escape") { closeCmd(); }
   });
   list.addEventListener("click", (e) => { const opt = e.target.closest(".command__opt"); if (opt) { active = +opt.dataset.i; runActive(); } });
   list.addEventListener("mousemove", (e) => { const opt = e.target.closest(".command__opt"); if (opt) setActive(+opt.dataset.i); });
 
+  // The palette is an overlay, hidden by default: Cmd/Ctrl+K toggles it.
+  // (Deliberately not wired into the settings panel — that's for a11y controls;
+  // a hidden ⌘K palette is the standard pattern and ready to grow.)
+  let opener = null;
+  function openCmd() {
+    if (!root.classList.contains("open")) opener = document.activeElement;
+    root.classList.add("open"); root.inert = false;
+    input.focus(); input.select(); render(input.value);
+  }
+  function closeCmd() {
+    const focusInside = root.contains(document.activeElement); // clear() blurs the input, so capture first
+    clear();
+    input.removeAttribute("aria-activedescendant"); // clear() may re-render default matches and re-set it
+    root.classList.remove("open"); root.inert = true;
+    // return focus to whatever opened the palette so keyboard users keep their place
+    if (opener && focusInside) opener.focus();
+    opener = null;
+  }
   document.addEventListener("keydown", (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); input.focus(); input.select(); }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      root.classList.contains("open") ? closeCmd() : openCmd();
+    }
   });
-  document.addEventListener("click", (e) => { if (!root.contains(e.target)) list.classList.remove("open"); });
+  document.addEventListener("click", (e) => {
+    if (root.classList.contains("open") && !root.contains(e.target)) closeCmd();
+  });
 
   render("");
 })();

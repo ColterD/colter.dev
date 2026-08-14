@@ -69,16 +69,19 @@ async function buildRepos(env) {
   return JSON.stringify(out);
 }
 
-// --- OmniRoute uptime (self-check from the edge; public /v1 is Access-bypassed) ---
-const LLM_CHECK_URL = "https://llm.colter.dev/v1/models";
-const LLM_TIMEOUT_MS = 8000;
+// --- service uptime (self-checks from the edge; llm /v1 is Access-bypassed) ---
+const CHECKS = {
+  llm: "https://llm.colter.dev/v1/models",
+  cp: "https://colter.plus/",
+};
+const CHECK_TIMEOUT_MS = 8000;
 
-async function checkLlm() {
+async function checkUrl(url) {
   const t0 = Date.now();
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), LLM_TIMEOUT_MS);
+  const timer = setTimeout(() => ctrl.abort(), CHECK_TIMEOUT_MS);
   try {
-    const r = await fetch(LLM_CHECK_URL, { signal: ctrl.signal, headers: { "User-Agent": "colter.dev status" } });
+    const r = await fetch(url, { signal: ctrl.signal, headers: { "User-Agent": "colter.dev status" } });
     return { ok: r.ok, ms: Date.now() - t0, ts: Date.now() };
   } catch {
     return { ok: false, ms: 0, ts: Date.now() };
@@ -86,10 +89,16 @@ async function checkLlm() {
     clearTimeout(timer);
   }
 }
-function llmBadge(s) {
+async function runHealth(env) {
+  const [llm, cp] = await Promise.all([checkUrl(CHECKS.llm), checkUrl(CHECKS.cp)]);
+  const health = { llm, cp };
+  await env.REPOS.put("health", JSON.stringify(health), { expirationTtl: 600 }).catch(() => {});
+  return health;
+}
+function statusBadge(s) {
   if (!s) return '<i class="dot" style="background:var(--text-faint)"></i>checking…';
   const dot = `<i class="dot" style="background:${s.ok ? "var(--ok)" : "var(--bad)"}"></i>`;
-  return `${dot}${s.ok ? "up · " + s.ms + "ms" : "down"}`;
+  return `${dot}${s.ok ? "up" : "down"}`;
 }
 
 // --- hidden lore pages (easter eggs) ---
@@ -128,6 +137,7 @@ function headerEggs(headers) {
 
 export default {
   async fetch(req, env, ctx) {
+    const t0 = Date.now();
     const url = new URL(req.url);
     if (url.pathname === "/emily" || url.pathname === "/coco") return lorePage(url.pathname.slice(1));
     const res = await env.ASSETS.fetch(req);
@@ -143,17 +153,11 @@ export default {
       // leaving the cache unfilled → every request re-fetches the GitHub API.
       if (raw) ctx.waitUntil(env.REPOS.put("repos", raw, { expirationTtl: 600 }).catch(() => {}));
     }
-    // Health check NEVER blocks the render: on a KV miss the badge stays neutral
-    // ("checking…") for this request while the check fills KV in the background.
-    let llm = null;
-    try { llm = await env.REPOS.get("llm-status", { type: "json" }); } catch { llm = null; }
-    if (!llm) {
-      ctx.waitUntil(
-        checkLlm()
-          .then((s) => env.REPOS.put("llm-status", JSON.stringify(s), { expirationTtl: 600 }))
-          .catch(() => {})
-      );
-    }
+    // Health checks NEVER block the render: on a KV miss the badges stay neutral
+    // ("checking…") for this request while both checks fill KV in the background.
+    let health = null;
+    try { health = await env.REPOS.get("health", { type: "json" }); } catch { health = null; }
+    if (!health) ctx.waitUntil(runHealth(env).catch(() => {}));
     // clone before consuming: the fallback path needs an unread body
     const fallback = res.clone();
     try {
@@ -164,13 +168,16 @@ export default {
       }
       const colo = (req.cf && req.cf.colo) ? req.cf.colo : null;
       if (colo) html = html.replace(/<span id="edge-colo">[^<]*<\/span>/, `<span id="edge-colo">${esc(colo)}</span>`);
+      html = html.replace(/<span id="edge-ms">[^<]*<\/span>/, `<span id="edge-ms">${Date.now() - t0}</span>`);
       const sha = env.COMMIT_SHA ? String(env.COMMIT_SHA) : "";
       if (sha) {
         html = html.replace(/<a id="deploy-sha"[^>]*>[^<]*<\/a>/,
           `<a id="deploy-sha" class="edge-link" href="https://github.com/ColterD/colter.dev/commit/${esc(sha)}" target="_blank" rel="noopener">${esc(sha)}</a>`);
       }
       html = html.replace(/<span id="llm-status"[^>]*>[\s\S]*?<\/span>/,
-        `<span id="llm-status" title="OmniRoute health, checked from the edge">${llmBadge(llm)}</span>`);
+        `<span id="llm-status" title="OmniRoute health, checked from the edge${health && health.llm ? " · " + health.llm.ms + "ms" : ""}">${statusBadge(health && health.llm)}</span>`);
+      html = html.replace(/<span id="cp-status"[^>]*>[\s\S]*?<\/span>/,
+        `<span id="cp-status" title="Colter+ health, checked from the edge${health && health.cp ? " · " + health.cp.ms + "ms" : ""}">${statusBadge(health && health.cp)}</span>`);
       const headers = new Headers(res.headers);
       headers.set("Cache-Control", "public, max-age=60");
       return new Response(html, { status: res.status, statusText: res.statusText, headers: headerEggs(headers) });
@@ -191,10 +198,10 @@ export default {
         console.error("cron buildRepos failed:", err && err.message);
       }
       try {
-        const llm = await checkLlm();
-        await env.REPOS.put("llm-status", JSON.stringify(llm), { expirationTtl: 7200 });
+        const [llm, cp] = await Promise.all([checkUrl(CHECKS.llm), checkUrl(CHECKS.cp)]);
+        await env.REPOS.put("health", JSON.stringify({ llm, cp }), { expirationTtl: 7200 });
       } catch (err) {
-        console.error("cron checkLlm failed:", err && err.message);
+        console.error("cron health checks failed:", err && err.message);
       }
     })());
   },
