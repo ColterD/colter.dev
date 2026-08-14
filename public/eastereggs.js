@@ -12,17 +12,27 @@
     setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 220); }, 1800);
   }
 
-  // 1. Konami code (↑↑↓↓←→←→BA) → Emily boot: a comet storm + a console line
+  // 1. Konami code (↑↑↓↓←→←→BA) → Emily boot: a comet storm + a console line.
+  //    Entering it twice within 6s engages warp.
   const SEQ = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
-  let idx = 0;
+  let idx = 0, lastKonami = -1e9; // NOT 0: performance.now() starts near 0, so a first-code-within-6s-of-load would false-trigger warp
   document.addEventListener("keydown", (e) => {
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     idx = (k === SEQ[idx]) ? idx + 1 : (k === SEQ[0] ? 1 : 0);
     if (idx === SEQ.length) {
       idx = 0;
-      if (window.starfield && window.starfield.burst) window.starfield.burst(14);
-      console.log("%cemily: boot sequence complete. what comes after 'agentic'?", "color:#9D7BE0;font:600 14px Lexend,system-ui,sans-serif");
-      toast("emily: boot sequence complete");
+      const now = performance.now();
+      const isWarp = now - lastKonami < 6000;
+      lastKonami = now;
+      if (window.starfield && window.starfield.burst && !isWarp) window.starfield.burst(14);
+      if (isWarp && window.starfield && window.starfield.warp) {
+        window.starfield.warp();
+        console.log("%cwarp engaged. hold on.", "color:#9D7BE0;font:600 14px Lexend,system-ui,sans-serif");
+        toast("warp engaged");
+      } else {
+        console.log("%cemily: boot sequence complete. what comes after 'agentic'?", "color:#9D7BE0;font:600 14px Lexend,system-ui,sans-serif");
+        toast("emily: boot sequence complete");
+      }
     }
   });
 
