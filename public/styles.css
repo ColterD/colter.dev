@@ -102,6 +102,14 @@ body {
   letter-spacing: 0.26em; text-transform: uppercase; color: var(--text-faint);
 }
 .cards { display: flex; flex-direction: column; gap: 0.6rem; }
+:root { --ok:#5ad17a; --bad:#ff6b6b; --warn:#e3c54a; --mono: ui-monospace,'SFMono-Regular','Cascadia Code',Consolas,monospace; }
+.card__head { flex-wrap: wrap; }
+.card__meta { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--text-faint); font-size: 0.7rem; }
+.card__meta .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px rgba(255,255,255,0.05); }
+.card__meta code { font-family: var(--mono); font-size: 0.68rem; }
+.card__updated { margin: 0.35rem 0 0; font-size: 0.66rem; color: var(--text-faint); }
+.badge-link { text-decoration: none; transition: color 0.16s ease, border-color 0.16s ease; }
+.badge-link:hover { color: var(--accent); border-color: var(--border-hi); }
 .card { padding: 0.9rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
 .card__head { display: flex; align-items: center; gap: 0.5rem; }
 .card__icon { color: var(--accent); display: inline-flex; }

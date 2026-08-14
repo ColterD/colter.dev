@@ -2,10 +2,22 @@ name = "colter-dev"
 account_id = "5409c4f68aa060e1f3723cc978c075d3"
 compatibility_date = "2026-08-13"
 workers_dev = false
+main = "worker.js"
 
-# Serve the apex directly from this Worker (fixes "Visitors cannot reach colter.dev")
+# Serve the apex directly from this Worker
 routes = [{ pattern = "colter.dev", custom_domain = true }]
 
 [assets]
 directory = "./public"
+binding = "ASSETS"
 not_found_handling = "single-page-application"
+run_worker_first = true
+
+# Live "Currently working on" tracker store
+[[kv_namespaces]]
+binding = "REPOS"
+id = "2ddfd1a8f85e4278be8caa9b6fbde907"
+
+# Refresh repo data every 10 minutes
+[triggers]
+crons = ["*/10 * * * *"]
