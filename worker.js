@@ -171,7 +171,8 @@ export default {
         const recent = Array.isArray(data) ? data : data.recent;   // old shape = bare array
         const featured = Array.isArray(data) ? null : data.featured;
         if (Array.isArray(recent)) {
-          html = html.replace(/<!--BEGIN_RECENT-->[\s\S]*?<!--END_RECENT-->/, renderCards(recent));
+          // keep the markers in the SERVED html too, so the injection contract survives
+          html = html.replace(/<!--BEGIN_RECENT-->[\s\S]*?<!--END_RECENT-->/, `<!--BEGIN_RECENT-->${renderCards(recent)}<!--END_RECENT-->`);
         }
         if (featured) {
           if (featured.emily) html = html.replace(/<p class="card__updated" id="featured-emily-updated">[^<]*<\/p>/, `<p class="card__updated" id="featured-emily-updated">updated ${relTime(featured.emily)}</p>`);
