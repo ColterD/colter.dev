@@ -3,6 +3,7 @@
 // PAT, caches build-status/commit/updated in KV; the fetch handler SSRs them into index.html
 // (under BEGIN_RECENT/END_RECENT) and stamps the Cloudflare edge colo. Static fallback if cold.
 const EXCLUDE = new Set(["colter.dev", "emily", "coco"]); // this site + the pinned (Featured) repos
+const FEATURED = ["emily", "coco"];                        // pinned cards; their pushed_at feeds "updated X ago"
 
 const ICONS = {
   repo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1V7l-3-3H5a1 1 0 0 0-1 1Z"/><path d="M8 8h8 M8 12h8 M8 16h5"/></svg>',
@@ -57,6 +58,9 @@ async function buildRepos(env) {
     .filter((r) => !EXCLUDE.has(r.name))
     .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at)) // re-rank: don't trust list order
     .slice(0, 3);
+  // featured (pinned) pushed dates come from the SAME page — no extra API calls
+  const featured = {};
+  for (const r of all) if (FEATURED.includes(r.name)) featured[r.name] = r.pushed_at;
   const out = [];
   for (const r of top) {
     const branch = r.default_branch || "main";
@@ -66,7 +70,7 @@ async function buildRepos(env) {
     if (commit && commit.sha) state = (await gh(`/repos/${r.full_name}/commits/${commit.sha}/status`, token))?.state || null;
     out.push({ name: r.name, full: r.full_name, private: !!r.private, url: r.html_url, description: r.description, pushed: r.pushed_at, sha, state });
   }
-  return JSON.stringify(out);
+  return JSON.stringify({ recent: out, featured });
 }
 
 // --- service uptime (self-checks from the edge; llm /v1 is Access-bypassed) ---
@@ -163,8 +167,17 @@ export default {
     try {
       let html = await res.text();
       if (raw) {
-        const cards = renderCards(JSON.parse(raw));
-        html = html.replace(/<!--BEGIN_RECENT-->[\s\S]*?<!--END_RECENT-->/, cards);
+        const data = JSON.parse(raw);
+        const recent = Array.isArray(data) ? data : data.recent;   // old shape = bare array
+        const featured = Array.isArray(data) ? null : data.featured;
+        if (Array.isArray(recent)) {
+          // keep the markers in the SERVED html too, so the injection contract survives
+          html = html.replace(/<!--BEGIN_RECENT-->[\s\S]*?<!--END_RECENT-->/, `<!--BEGIN_RECENT-->${renderCards(recent)}<!--END_RECENT-->`);
+        }
+        if (featured) {
+          if (featured.emily) html = html.replace(/<p class="card__updated" id="featured-emily-updated">[^<]*<\/p>/, `<p class="card__updated" id="featured-emily-updated">updated ${relTime(featured.emily)}</p>`);
+          if (featured.coco) html = html.replace(/<p class="card__updated" id="featured-coco-updated">[^<]*<\/p>/, `<p class="card__updated" id="featured-coco-updated">updated ${relTime(featured.coco)}</p>`);
+        }
       }
       const colo = (req.cf && req.cf.colo) ? req.cf.colo : null;
       if (colo) html = html.replace(/<span id="edge-colo">[^<]*<\/span>/, `<span id="edge-colo">${esc(colo)}</span>`);
