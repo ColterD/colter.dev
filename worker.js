@@ -174,10 +174,10 @@ export default {
         html = html.replace(/<a id="deploy-sha"[^>]*>[^<]*<\/a>/,
           `<a id="deploy-sha" class="edge-link" href="https://github.com/ColterD/colter.dev/commit/${esc(sha)}" target="_blank" rel="noopener">${esc(sha)}</a>`);
       }
-      html = html.replace(/<span id="llm-status"[^>]*>[\s\S]*?<\/span>/,
-        `<span id="llm-status" title="OmniRoute health, checked from the edge${health && health.llm ? " · " + health.llm.ms + "ms" : ""}">${statusBadge(health && health.llm)}</span>`);
-      html = html.replace(/<span id="cp-status"[^>]*>[\s\S]*?<\/span>/,
-        `<span id="cp-status" title="Colter+ health, checked from the edge${health && health.cp ? " · " + health.cp.ms + "ms" : ""}">${statusBadge(health && health.cp)}</span>`);
+      html = html.replace(/<span class="row__status" id="omniroute-status"[^>]*>[\s\S]*?<\/span>/,
+        `<span class="row__status" id="omniroute-status" title="OmniRoute health, checked from the edge${health && health.llm ? " · " + health.llm.ms + "ms" : ""}">${statusBadge(health && health.llm)}</span>`);
+      html = html.replace(/<span class="row__status" id="colterplus-status"[^>]*>[\s\S]*?<\/span>/,
+        `<span class="row__status" id="colterplus-status" title="Colter+ health, checked from the edge${health && health.cp ? " · " + health.cp.ms + "ms" : ""}">${statusBadge(health && health.cp)}</span>`);
       const headers = new Headers(res.headers);
       headers.set("Cache-Control", "public, max-age=60");
       return new Response(html, { status: res.status, statusText: res.statusText, headers: headerEggs(headers) });
