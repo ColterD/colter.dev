@@ -114,6 +114,8 @@ body {
   letter-spacing: 0.05em;
   color: var(--text-muted);
 }
+/* --text-muted (not faint): faint fails WCAG AA on body bg in 4 themes; small size + tracking keeps it subordinate */
+.local-time { margin: 0.45rem 0 0; font-size: 0.64rem; letter-spacing: 0.06em; color: var(--text-muted); }
 
 /* socials live directly under the tagline now */
 .socials { display: flex; flex-direction: row; justify-content: center; gap: 0.7rem; margin-top: 1.15rem; }
@@ -170,12 +172,17 @@ body {
 .row:hover { background: var(--surface-hi); border-color: var(--border-hi); transform: translateX(2px); }
 .row__icon, .row__arrow { color: var(--text-muted); display: inline-flex; transition: color 0.16s ease; }
 .row:hover .row__icon { color: var(--accent); }
-.row__arrow { margin-left: auto; opacity: 0.55; transition: opacity 0.16s ease, color 0.16s ease; }
+.row__arrow { margin-left: 0; opacity: 0.55; transition: opacity 0.16s ease, color 0.16s ease; }
 .row:hover .row__arrow { opacity: 1; color: var(--accent); }
 .row__icon svg, .row__arrow svg { display: block; width: 19px; height: 19px; }
 .row__text { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
 .row__title { font-size: 0.98rem; font-weight: 550; }
 .row__sub { font-size: 0.76rem; color: var(--text-faint); }
+/* service health dot + label, lives inside the service row (SSR'd by the Worker).
+   --text-muted: the row surface drops faint below AA in every theme but Regal */
+.row__status { margin-left: auto; display: inline-flex; align-items: center; gap: 0.32rem; font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; }
+.row__status .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.row:hover .row__status { color: var(--text); }
 
 .featured h2, .work h2 {
   margin: 0 0 0.7rem;
@@ -210,9 +217,9 @@ body {
 .cite a:hover { text-decoration: underline; }
 .recent-empty { font-size: 0.78rem; color: var(--text-faint); margin: 0.5rem 0 0; }
 
-/* references footer — one uniform rhythm for every footer line */
-.foot { margin-top: 0; display: flex; flex-direction: column; gap: 0.55rem; }
-.refs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+/* references footer — three tight lines, separated from the refs above */
+.foot { margin-top: 0; display: flex; flex-direction: column; gap: 0.28rem; }
+.refs { list-style: none; margin: 0 0 1.15rem; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
 .refs li { font-size: 0.7rem; line-height: 1.45; color: var(--text-faint); padding-left: 1.1rem; position: relative; }
 .refs .ref-n { position: absolute; left: 0; color: var(--text-muted); }
 .refs a { color: var(--accent); text-decoration: none; }
@@ -223,9 +230,6 @@ body {
 .edge { text-align: center; font-size: 0.62rem; letter-spacing: 0.05em; color: var(--text-faint); margin: 0.5rem 0 0; }
 .edge-link { color: var(--text-faint); text-decoration: none; border-bottom: 1px dotted var(--border); }
 .edge-link:hover { color: var(--accent); }
-/* footer status dot (OmniRoute health) */
-#llm-status, #cp-status { display: inline-flex; align-items: center; gap: 0.32rem; }
-#llm-status .dot, #cp-status .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
 
 /* settings button + panel */
 .settings-btn {
